@@ -1,0 +1,6 @@
+{
+  "note": "予算の線の決まり。値は作者が置いた既定。自分で決めたら書き換える。読むのは core/budget.py。説明は core/graph/budget.md",
+  "reserve_pct": 15,
+  "slack_pct": 15,
+  "pace_small": 1.3
+}
