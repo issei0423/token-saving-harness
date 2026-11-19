@@ -5,6 +5,7 @@
 2. 文書が指す ~/.claude/token-harness/<パス> が、このリポジトリにある
 3. 核の「→ 読む」の合図の文書が core/graph/ にある
 4. 係の文書の頭に name・description・tools・model がある
+5. シェルの変数のすぐ後ろに日本語を書いていない（macOS の bash 3.2 で落ちる）
 """
 import re
 import sys
@@ -53,6 +54,19 @@ for p in agents:
     if not all(k in head for k in ("name", "description", "tools", "model")) or head.get("name", "").strip() != p.stem:
         bad.append(p.name)
 report(f"係の文書（{len(agents)} 件）の頭に name・description・tools・model があり、name がファイル名と同じ", len(agents) == 5 and not bad, ", ".join(bad))
+
+# 5. シェルの変数のすぐ後ろに ASCII でない字を書いていない
+#    macOS の bash 3.2 は、$new・ の「・」のバイトを変数名に巻き込み、set -u で落ちる。${new}・ と書く
+bad = []
+for p in sorted(ROOT.rglob("*.sh")):
+    if ".git" in p.parts:
+        continue
+    for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+        if line.lstrip().startswith("#"):
+            continue
+        if re.search(r"\$[A-Za-z_][A-Za-z0-9_]*[^\x00-\x7f]", line):
+            bad.append(f"{p.relative_to(ROOT).as_posix()}:{i}")
+report("シェルの変数のすぐ後ろに日本語を書いていない（${…} で囲む）", not bad, ", ".join(bad))
 
 print(f"合計 FAIL {fails}")
 sys.exit(1 if fails else 0)

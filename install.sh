@@ -52,7 +52,8 @@ for f in "$here"/core/agents/*.md; do
     replaced=$((replaced + 1))
   fi
 done
-echo "合計：新しく $new・同じ $same・置き換え $replaced・失敗 $failed"
+# 変数のすぐ後ろに日本語を書くときは ${…} で囲む（macOS の bash 3.2 は、後ろのバイトを変数名に巻き込む）
+echo "合計：新しく ${new}・同じ ${same}・置き換え ${replaced}・失敗 ${failed}"
 
 want="$HOME/.claude/token-harness"
 if [ "$here" != "$want" ]; then
